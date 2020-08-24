@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MyMap</title>
+
+    <link rel="stylesheet" href="js/jquery.mobile-1.4.5.min.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.mobile-1.4.5.min.js"></script>
+    <link rel ="stylesheet" href ="leaflet/leaflet.css">
+    <script src ="leaflet/leaflet.js"></script>
+
+	<!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@2.5.0/dist/esri-leaflet.js"
+    integrity="sha512-ucw7Grpc+iEQZa711gcjgMBnmd9qju1CICsRaryvX7HJklK0pGl/prxKvtHwpgm5ZHdvAil7YPxI1oWPOWK3UQ=="
+    crossorigin=""></script>
+
+  <!-- Load Esri Leaflet Geocoder from CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.css"
+    integrity="sha512-IM3Hs+feyi40yZhDH6kV8vQMg4Fh20s9OzInIIAc4nx7aMYMfo+IenRUekoYsHZqGkREUgx0VvlEsgm7nCDW9g=="
+    crossorigin="">
+  <script src="https://unpkg.com/esri-leaflet-geocoder@2.3.3/dist/esri-leaflet-geocoder.js"
+    integrity="sha512-HrFUyCEtIpxZloTgEKKMq4RFYhxjJkCiF5sDxuAokklOeZ68U2NPfh4MFtyIVWlsKtVbK5GD2/JzFyAfvT5ejA=="
+    crossorigin=""></script>
+
+    <script src="cordova.js"></script>
+
+    <link rel="icon" href="image/earth.jpg" type="image/jpg">
+
+</head>
+<body>
+
+     <!-- home page -->
+     <div data-role="page" id="home" data-theme="a">
+
+        <div data-role="header">
+            <h1>GeoLocation - Main Menu</h1>
+
+            <div class="container">
+                <img src="image/earth2.jpg" style="width:100%; height:100%;" type="image/jpg">
+            </div>
+
+        </div>
+    
+        <div data-role="main" class="ui-content">
+
+            <p>
+                This application will provide its user informations on their current location. Additionally, 
+                a user can search for a specific area in a map and can even click on any point on the map to reveal its location.
+            </p>
+
+            <a href="#myLocation" data-role="button" data-icon="star" data-iconpos="right">My Location</a>
+            <a href="#searchLocation" data-role="button" data-icon="search" data-iconpos="right">Search Location</a>
+            <a href="#whatAround" data-role="button" data-icon="forward" data-iconpos="right">What's Around</a>            
+
+        </div>
+        
+        <div data-role="footer" id="footer">
+            <h1>&copy; - Sembhoo Gowtam</h1>
+        </div>
+
+    </div>
+    
+            <!-- myLocation Page -->
+    
+    <div data-role="page" id="myLocation" data-theme="a">
+    
+        <div data-role="header">
+            <h1>GeoLocation - My Location</h1>
+        </div>
+        <div class="nav">
+            <div data-role="navbar">
+                <ul>
+                    <li>
+                        <a href="#home" class="ui-btn ui-icon-home ui-btn-icon-top">Home</a>
+                    </li>
+                    <li>
+                        <a href="#searchLocation" class="ui-btn ui-icon-search ui-btn-icon-top">Search Location</a><br>
+                    </li>
+                    <li>
+                        <a href="#whatAround" class="ui-btn ui-icon-forward ui-btn-icon-top">What's Around</a><br>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div data-role="main" class="ui-content">
+
+            <p><span style="color:red;font-weight: bold;">*Note: If you did not give permission to access location, a general map will be displayed, but not your current position.</span></p>
+            
+            <div id="mapid" style="width:auto; height:600px;"></div>
+
+            <script type="text/javascript">
+	
+                if(navigator.geolocation == undefined){
+        
+                    alert("Geolocation undefined");
+        
+                }else
+                {
+        
+                    alert("Geolocation Available");
+            
+                    navigator.geolocation.getCurrentPosition(userLocated, locationError);
+            
+                    function userLocated(position)
+                    {
+        
+                        var latitude = position.coords.latitude;
+                        var longitude = position.coords.longitude;
+                        alert("Latitude : "+latitude+", Longitude : "+longitude);
+        
+                        var mymap = L.map('mapid').setView([latitude, longitude], 16);
+                
+                        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', { maxZoom: 19,
+                        attribution: 'Map data &copy;'+'<a href="https://www.openstreetmap.org/">OpenStreetMap</a>'+
+                        'contributors,<a href="https://creativecommons.org/licenses'+'/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://'+
+                        'www.mapbox.com/">Mapbox</a>', id: 'mapbox.streets', accessToken:'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc'+
+                        'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'}).addTo(mymap);
+                    
+                        var marker = L.marker([latitude, longitude]).addTo(mymap);
+                        marker.bindPopup("You are Here");
+        
+                    }
+            
+                    function locationError(error)
+                    {
+                        switch(error.code){
+                        case error.PERMISSION_DENIED:
+                        alert("Permission Denied : " + error.message);
+
+                        var mymap = L.map('mapid').setView([-20.1773196, 57.66036739999999], 10);
+                        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', { maxZoom: 19,
+                        attribution: 'Map data &copy;'+'<a href="https://www.openstreetmap.org/">OpenStreetMap</a>'+
+                        'contributors,<a href="https://creativecommons.org/licenses'+'/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://'+
+                        'www.mapbox.com/">Mapbox</a>', id: 'mapbox.streets', accessToken:'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc'+
+                        'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'}).addTo(mymap);
+
+                        break;
+                        case error.POSITION_UNAVAILABLE:
+                        alert("Position Not Available : "+error.message);
+                        break;
+                        case error.TIMEOUT:
+                        alert("Connection Timeout : "+error.message);
+                        break;
+                        }
+                    }
+                }
+        
+                </script>
+
+        </div>
+        
+        <div data-role="footer">
+            <h1>&copy; - Sembhoo Gowtam</h1>
+        </div>
+    </div>
+
+    <!--search loc page-->
+
+    <div data-role="page" id="searchLocation" data-theme="a">
+    
+        <div data-role="header">
+            <h1>GeoLocation - Search Location</h1>
+        </div>
+        <div class="nav">
+            <div data-role="navbar">
+                <ul>
+                    <li>
+                        <a href="#home" class="ui-btn ui-icon-home ui-btn-icon-top">Home</a>
+                    </li>
+                    <li>
+                        <a href="#myLocation" class="ui-btn ui-icon-star ui-btn-icon-top">My Location</a><br>
+                    </li>
+                    <li>
+                        <a href="#whatAround" class="ui-btn ui-icon-forward ui-btn-icon-top">What's Around</a><br>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    
+        <div data-role="main" class="ui-content">
+
+                <div id="mymap" style="width: auto; height: 600px;"></div>
+
+                <script>
+                    
+                var mymap = L.map('mymap').setView([-20.1773196, 57.66036739999999], 10);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', { maxZoom: 19,
+                        attribution: 'Map data &copy;'+'<a href="https://www.openstreetmap.org/">OpenStreetMap</a>'+
+                        'contributors,<a href="https://creativecommons.org/licenses'+'/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://'+
+                        'www.mapbox.com/">Mapbox</a>', id: 'mapbox.streets', accessToken:'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc'+
+                        'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'}).addTo(mymap);
+
+                    var searchControl = L.esri.Geocoding.geosearch().addTo(mymap);
+					var results = L.LayerGroup().addTo(mymap);
+					searchControl.on('results', function(data) {
+						results.clearLayers();
+						for (var i = data.results.length - 1; i >= 0; i--)
+                        {
+							results.addLayer(L.marker(data.results[i].latlng).addTo(mymap));
+						}
+					});
+
+                </script>
+            
+           
+        </div>
+
+        <div data-role="footer">
+            <h1>&copy; - Sembhoo Gowtam</h1>
+        </div>
+
+    </div>
+
+     <!--view location around page-->
+
+     <div data-role="page" id="whatAround" data-theme="a">
+    
+        <div data-role="header">
+            <h1>GeoLocation - What is Around</h1>
+        </div>
+        <div class="nav">
+            <div data-role="navbar">
+                <ul>
+                    <li>
+                        <a href="#home" class="ui-btn ui-icon-home ui-btn-icon-top">Home</a>
+                    </li>
+                    <li>
+                        <a href="#myLocation" class="ui-btn ui-icon-star ui-btn-icon-top">My Location</a><br>
+                    </li>
+                    <li>
+                        <a href="#searchLocation" class="ui-btn ui-icon-search ui-btn-icon-top">Search Location</a><br>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    
+        <div data-role="main" class="ui-content">
+
+                <div id="mymap2" style="width: auto; height: 600px;"></div>
+
+                <script>
+                    
+                var mymap = L.map('mymap2').setView([-20.20665, 57.6755], 11);
+                L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', { maxZoom: 19,
+                        attribution: 'Map data &copy;'+'<a href="https://www.openstreetmap.org/">OpenStreetMap</a>'+
+                        'contributors,<a href="https://creativecommons.org/licenses'+'/by-sa/2.0/">CC-BY-SA</a>,Imagery © <a href="https://'+
+                        'www.mapbox.com/">Mapbox</a>', id: 'mapbox.streets', accessToken:'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYyc'+
+                        'XBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'}).addTo(mymap);
+
+                        var geocodeService = L.esri.Geocoding.geocodeService();
+					mymap.on('click', function(e) {
+						geocodeService.reverse().latlng(e.latlng).run(function(error, result) {
+							if (error) {
+								return;
+							}
+							var popLocation = e.latlng;
+							var popup = L.popup()
+								.setLatLng(popLocation)
+								.setContent(result.address.Match_addr)
+								.openOn(mymap);
+						});
+					});
+
+                </script>
+            
+           
+        </div>
+
+        <div data-role="footer">
+            <h1>&copy; - Sembhoo Gowtam</h1>
+        </div>
+
+    </div>
+    
+</body>
+</html>
